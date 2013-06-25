@@ -76,12 +76,23 @@
                         travelMode: google.maps.DirectionsTravelMode.DRIVING
                     }, function(response, status) {
                         if (status == google.maps.DirectionsStatus.OK) {
-                            // last_point = response.routes[0].legs[0].end_location;
+                            var route = response.routes[0].overview_path;
 
-                            $(response.routes[0].overview_path).each(function(index, item) {
+                            $(route).each(function(index, item) {
                                 line.getPath().push(item);
-                                last_point = item;
                             });
+
+                            last_point = route[route.length - 1];
+
+                            if (route.length > 1) {
+                                var heading = google.maps.geometry.spherical.computeHeading(route[route.length - 2], last_point);
+                                var distance = google.maps.geometry.spherical.computeOffset(point, 50, heading);
+
+                                new google.maps.Marker({
+                                    position: distance,
+                                    map: map
+                                });
+                            }
                         }
                     });
                 }
