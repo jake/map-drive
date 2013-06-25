@@ -16,6 +16,20 @@
             #map-canvas {
                 height: 100%;
             }
+
+            #controls {
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 5px;
+            }
+
+                #controls a {
+                    text-decoration: none;
+                    color: inherit;
+                    padding: 4px 6px;
+                    -webkit-appearance: default-button;
+                }
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
@@ -80,6 +94,12 @@
                 line.setMap(map);
                 line.getPath().push(start_point);
 
+                var possible_directions = {
+                    left: false,
+                    forward: false,
+                    right: false,
+                }
+
                 function drop_marker(point, color) {
                     new google.maps.Marker({
                         map: map,
@@ -109,6 +129,10 @@
                 function extend_line(point) {
                     map.panTo(point);
 
+                    possible_directions.left = false;
+                    possible_directions.forward = false;
+                    possible_directions.right = false;
+
                     directionsService.route({
                         origin: last_point || start_point,
                         destination: point,
@@ -134,8 +158,9 @@
                                 drop_marker(direction_forward, 'green');
                                 drop_marker(direction_right, 'red');
 
-                                snap_to_road(direction_left, drop_marker);
-                                snap_to_road(direction_right, drop_marker);
+                                possible_directions.forward = direction_forward;
+                                snap_to_road(direction_left, function(point){ possible_directions.left = point; });
+                                snap_to_road(direction_right, function(point){ possible_directions.right = point; });
                             }
                         } else {
                             alert(status);
@@ -148,10 +173,30 @@
                 google.maps.event.addListener(map, 'click', function(event){
                     extend_line(event.latLng);
                 });
+
+                $('#drive_left').click(function(event){
+                    if (possible_directions.left) extend_line(possible_directions.left);
+                    event.preventDefault();
+                });
+
+                $('#drive_forward').click(function(event){
+                    if (possible_directions.forward) extend_line(possible_directions.forward);
+                    event.preventDefault();
+                });
+
+                $('#drive_right').click(function(event){
+                    if (possible_directions.right) extend_line(possible_directions.right);
+                    event.preventDefault();
+                });
             }
         </script>
     </head>
     <body>
-        <div id="map-canvas"/>
+        <div id="map-canvas"></div>
+        <div id="controls">
+            <a href="#" id="drive_left">Turn left</a>
+            <a href="#" id="drive_forward">Go straight</a>
+            <a href="#" id="drive_right">Turn Right</a>
+        </div>
     </body>
 </html>
