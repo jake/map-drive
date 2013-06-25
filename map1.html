@@ -99,8 +99,9 @@
                     }, function(response, status) {
                         if (status == google.maps.DirectionsStatus.OK) {
                             var road_point = response.routes[0].legs[0].end_location;
-                            drop_marker(road_point);
-                            callback(road_point);
+                            if (typeof callback == 'function') callback(road_point);
+                        } else {
+                            alert(status);
                         }
                     });
                 }
@@ -118,18 +119,20 @@
 
                             $(route).each(function(index, item) {
                                 line.getPath().push(item);
+                                last_point = item;
                             });
-
-                            last_point = route[route.length - 1];
 
                             if (route.length > 1) {
                                 var heading = google.maps.geometry.spherical.computeHeading(route[route.length - 2], last_point);
                                 var distance = google.maps.geometry.spherical.computeOffset(point, 50, heading);
 
-                                snap_to_road(distance, extend_line);
+                                snap_to_road(distance, drop_marker);
+
+                                snap_to_road(google.maps.geometry.spherical.computeOffset(point, 50, heading + 45), drop_marker);
+                                snap_to_road(google.maps.geometry.spherical.computeOffset(point, 50, heading - 45), drop_marker);
                             }
                         } else {
-                            console.log(status);
+                            alert(status);
                         }
                     });
                 }
