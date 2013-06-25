@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <style type="text/css">
+            html {
+                height: 100%;
+            }
+
+            body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #map-canvas {
+                height: 100%;
+            }
+        </style>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script>
+            google.maps.visualRefresh = true;
+            google.maps.event.addDomListener(window, 'load', initialize);
+
+            function initialize() {
+                var directionsService = new google.maps.DirectionsService();
+
+                var start_point = new google.maps.LatLng(40.70915603637695, -73.94331359863281);
+
+                var map = new google.maps.Map(document.getElementById('map-canvas'), {
+                    center: start_point,
+                    zoom: 17,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    styles: [{
+                        "stylers": [
+                            { "saturation": -100 },
+                            { "gamma": 1.4 },
+                            { "lightness": 1 }
+                        ]
+                    }]
+                });
+
+                var line = new google.maps.Polyline({
+                    strokeColor: '#000000',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 3
+                });
+                line.setMap(map);
+                line.getPath().push(start_point);
+
+                function extend_line(point){
+                    directionsService.route({
+                        origin: point,
+                        destination: point,
+                        travelMode: google.maps.DirectionsTravelMode.DRIVING
+                    }, function(response, status) {
+                        if (status == google.maps.DirectionsStatus.OK) {
+                            line.getPath().push(response.routes[0].legs[0].end_location);
+                        }
+                    });
+                }
+
+                extend_line(new google.maps.LatLng(40.70915603637695, -73.94331359863281));
+            }
+        </script>
+    </head>
+    <body>
+        <div id="map-canvas"/>
+    </body>
+</html>
