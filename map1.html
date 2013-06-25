@@ -149,18 +149,24 @@
                             if (route.length > 1) {
                                 var heading = google.maps.geometry.spherical.computeHeading(route[route.length - 2], last_point);
 
-                                var direction_forward = google.maps.geometry.spherical.computeOffset(point, 50, heading);
+                                var direction_forward = google.maps.geometry.spherical.computeOffset(point, 30, heading);
 
-                                var direction_left = google.maps.geometry.spherical.computeOffset(point, 60, heading - 45);
-                                var direction_right = google.maps.geometry.spherical.computeOffset(point, 60, heading + 45);
+                                var direction_left = google.maps.geometry.spherical.computeOffset(point, 30, heading - 45);
+                                var direction_right = google.maps.geometry.spherical.computeOffset(point, 30, heading + 45);
 
-                                drop_marker(direction_left, 'blue');
                                 drop_marker(direction_forward, 'green');
-                                drop_marker(direction_right, 'red');
+                                drop_marker(direction_left, 'grey');
+                                drop_marker(direction_right, 'grey');
 
                                 possible_directions.forward = direction_forward;
-                                snap_to_road(direction_left, function(point){ possible_directions.left = point; });
-                                snap_to_road(direction_right, function(point){ possible_directions.right = point; });
+                                snap_to_road(direction_left, function(point){
+                                    drop_marker(point, 'blue');
+                                    possible_directions.left = point;
+                                });
+                                snap_to_road(direction_right, function(point){
+                                    drop_marker(point, 'red');
+                                    possible_directions.right = point;
+                                });
                             }
                         } else {
                             alert(status);
