@@ -33,13 +33,32 @@
                     center: start_point,
                     zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
-                    styles: [{
-                        "stylers": [
-                            { "saturation": -100 },
-                            { "gamma": 1.4 },
-                            { "lightness": 1 }
-                        ]
-                    }]
+                    styles: [
+                        {
+                            featureType: "all",
+                            stylers: [
+                                { visibility: "off" }
+                            ]
+                        },
+                        {
+                            featureType: "road",
+                            elementType: "geometry",
+                            stylers: [
+                                { visibility: "simplified" },
+                                { saturation: 100 },
+                                { color: "#ffffff" },
+                            ]
+                        },
+                        {
+                            featureType: "road",
+                            elementType: "labels",
+                            stylers: [
+                                { visibility: "on" },
+                                { saturation: -100 },
+                                { lightness: 40 },
+                            ]
+                        }
+                    ]
                 });
 
                 var line = new google.maps.Polyline({
