@@ -33,6 +33,7 @@
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="jquery.hotkeys.js"></script>
         <script>
             var marker = {
                 grey:   '#585858',
@@ -121,7 +122,7 @@
                             var road_point = response.routes[0].legs[0].end_location;
                             if (typeof callback == 'function') callback(road_point);
                         } else {
-                            alert(status);
+                            console.log(status);
                         }
                     });
                 }
@@ -169,7 +170,7 @@
                                 });
                             }
                         } else {
-                            alert(status);
+                            console.log(status);
                         }
                     });
                 }
@@ -193,6 +194,21 @@
                 $('#drive_right').click(function(event){
                     if (possible_directions.right) extend_line(possible_directions.right);
                     event.preventDefault();
+                });
+
+                $(document).bind('keydown', 'left', function(event){
+                    if (possible_directions.left) extend_line(possible_directions.left);
+                    return false;
+                });
+
+                $(document).bind('keydown', 'up', function(event){
+                    if (possible_directions.forward) extend_line(possible_directions.forward);
+                    return false;
+                });
+
+                $(document).bind('keydown', 'right', function(event){
+                    if (possible_directions.right) extend_line(possible_directions.right);
+                    return false;
                 });
             }
         </script>
