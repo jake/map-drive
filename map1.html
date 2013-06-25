@@ -62,6 +62,10 @@
                 }
 
                 extend_line(new google.maps.LatLng(40.70915603637695, -73.94331359863281));
+
+                google.maps.event.addListener(map, 'click', function(event){
+                    extend_line(event.latLng);
+                });
             }
         </script>
     </head>
