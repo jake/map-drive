@@ -20,6 +20,15 @@
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script>
+            var marker = {
+                grey:   '#585858',
+                red:    '#cb3333',
+                blue:   '#0098cb',
+                green:  '#78a41f',
+                yellow: '#fecb33',
+                purple: '#a44ba4',
+            };
+
             google.maps.visualRefresh = true;
             google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -62,7 +71,7 @@
                 });
 
                 var line = new google.maps.Polyline({
-                    strokeColor: '#000000',
+                    strokeColor: marker.yellow,
                     strokeOpacity: 1.0,
                     strokeWeight: 3
                 });
@@ -70,6 +79,8 @@
                 line.getPath().push(start_point);
 
                 function extend_line(point){
+                    map.setCenter(point);
+
                     directionsService.route({
                         origin: last_point || start_point,
                         destination: point,
@@ -89,8 +100,12 @@
                                 var distance = google.maps.geometry.spherical.computeOffset(point, 50, heading);
 
                                 new google.maps.Marker({
+                                    map: map,
                                     position: distance,
-                                    map: map
+                                    icon: {
+                                        url: 'marker/yellow.png',
+                                        anchor: new google.maps.Point(4, 4),
+                                    },
                                 });
                             }
                         }
