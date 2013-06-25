@@ -124,12 +124,18 @@
 
                             if (route.length > 1) {
                                 var heading = google.maps.geometry.spherical.computeHeading(route[route.length - 2], last_point);
-                                var distance = google.maps.geometry.spherical.computeOffset(point, 50, heading);
 
-                                snap_to_road(distance, drop_marker);
+                                var direction_forward = google.maps.geometry.spherical.computeOffset(point, 50, heading);
 
-                                snap_to_road(google.maps.geometry.spherical.computeOffset(point, 50, heading + 45), drop_marker);
-                                snap_to_road(google.maps.geometry.spherical.computeOffset(point, 50, heading - 45), drop_marker);
+                                var direction_left = google.maps.geometry.spherical.computeOffset(point, 60, heading - 45);
+                                var direction_right = google.maps.geometry.spherical.computeOffset(point, 60, heading + 45);
+
+                                drop_marker(direction_left, 'blue');
+                                drop_marker(direction_forward, 'green');
+                                drop_marker(direction_right, 'red');
+
+                                snap_to_road(direction_left, drop_marker);
+                                snap_to_road(direction_right, drop_marker);
                             }
                         } else {
                             alert(status);
