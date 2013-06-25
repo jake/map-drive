@@ -78,8 +78,33 @@
                 line.setMap(map);
                 line.getPath().push(start_point);
 
-                function extend_line(point){
-                    map.setCenter(point);
+                function drop_marker(point, color) {
+                    new google.maps.Marker({
+                        map: map,
+                        position: point,
+                        icon: {
+                            url: 'marker/' + (color || 'grey') + '.png',
+                            anchor: new google.maps.Point(4, 4),
+                        },
+                    });
+                }
+
+                function snap_to_road(point, callback) {
+                    directionsService.route({
+                        origin: point,
+                        destination: point,
+                        travelMode: google.maps.DirectionsTravelMode.DRIVING
+                    }, function(response, status) {
+                        if (status == google.maps.DirectionsStatus.OK) {
+                            var road_point = response.routes[0].legs[0].end_location;
+                            drop_marker(road_point);
+                            callback(road_point);
+                        }
+                    });
+                }
+
+                function extend_line(point) {
+                    map.panTo(point);
 
                     directionsService.route({
                         origin: last_point || start_point,
@@ -99,15 +124,10 @@
                                 var heading = google.maps.geometry.spherical.computeHeading(route[route.length - 2], last_point);
                                 var distance = google.maps.geometry.spherical.computeOffset(point, 50, heading);
 
-                                new google.maps.Marker({
-                                    map: map,
-                                    position: distance,
-                                    icon: {
-                                        url: 'marker/yellow.png',
-                                        anchor: new google.maps.Point(4, 4),
-                                    },
-                                });
+                                snap_to_road(distance, extend_line);
                             }
+                        } else {
+                            console.log(status);
                         }
                     });
                 }
