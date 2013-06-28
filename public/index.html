@@ -19,7 +19,6 @@
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-        <script src="jquery.hotkeys.js"></script>
         <script>
             var marker = {
                 grey:   '#585858',
@@ -73,7 +72,7 @@
                 });
 
                 function press_start() {
-                    if (current_player = prompt('Enter your name:')) {
+                    if (current_player = prompt('Enter your name:', 'jacob')) {
                         players[current_player] = {
                             color: 'blue',
                             marker: false,
@@ -116,6 +115,12 @@
 
                 google.maps.event.addListener(map, 'click', function(event){
                     move_marker(current_player, event.latLng);
+                });
+
+                var Stream = new EventSource('/stream/' + new Date().getTime());
+
+                Stream.addEventListener('heartbeat', function(e){
+                    console.log(e);
                 });
             }
         </script>
