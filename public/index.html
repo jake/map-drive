@@ -120,7 +120,15 @@
                 var Stream = new EventSource('/stream/' + new Date().getTime());
 
                 Stream.addEventListener('heartbeat', function(e){
-                    console.log(e);
+                    console.log('heartbeat');
+                });
+
+                Stream.addEventListener('register_player', function(e){
+                    console.log(e.data);
+                });
+
+                Stream.addEventListener('move_player', function(e){
+                    console.log(e.data);
                 });
             }
         </script>
