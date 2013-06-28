@@ -34,10 +34,19 @@
             google.maps.event.addDomListener(window, 'load', initialize);
 
             function initialize() {
-                var start_point = new google.maps.LatLng(40.70915603637695, -73.94331359863281);
+                var current_location = new google.maps.LatLng(40.70915603637695, -73.94331359863281);
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position){
+                        current_location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                        map.panTo(current_location);
+                    }, function(err){
+                        alert(err);
+                    });
+                }
 
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
-                    center: start_point,
+                    center: current_location,
                     zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     disableDefaultUI: true,
@@ -71,7 +80,7 @@
                 });
 
                 google.maps.event.addListener(map, 'click', function(event){
-                    extend_line(event.latLng);
+                    console.log(event.latLng);
                 });
             }
         </script>
