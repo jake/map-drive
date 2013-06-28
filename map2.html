@@ -30,28 +30,14 @@
                 purple: '#a44ba4',
             };
 
-            var players = {
-                'jacob': {
-                    'name': 'Jacob',
-                    'color': 'blue',
-                    'marker': false,
-                }
-            };
+            var players = {};
+
+            var current_player = false;
 
             google.maps.visualRefresh = true;
             google.maps.event.addDomListener(window, 'load', initialize);
 
             function initialize() {
-                // var current_location = new google.maps.LatLng(40.70915603637695, -73.94331359863281);
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position){
-                        move_marker('jacob', new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-                    }, function(err){
-                        alert(err);
-                    });
-                }
-
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
                     // center: current_location,
                     zoom: 17,
@@ -86,6 +72,26 @@
                     ]
                 });
 
+                function press_start() {
+                    if (current_player = prompt('Enter your name:')) {
+                        players[current_player] = {
+                            color: 'blue',
+                            marker: false,
+                        };
+
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(function(position){
+                                move_marker(current_player, new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+                            }, function(err){
+                                alert(err);
+                            });
+                        }
+                    } else {
+                        alert('Enter a name!');
+                        press_start();
+                    }
+                }
+
                 function new_marker(color, location) {
                     return new google.maps.Marker({
                         map: map,
@@ -106,8 +112,10 @@
                     map.panTo(location);
                 }
 
+                press_start();
+
                 google.maps.event.addListener(map, 'click', function(event){
-                    move_marker('jacob', event.latLng);
+                    move_marker(current_player, event.latLng);
                 });
             }
         </script>
