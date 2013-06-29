@@ -27,6 +27,13 @@ app.get('/stream/:name', function(req, res){
     stream.register(req.params.name, res);
 });
 
+app.get('/move_player/:name/:position', function(req, res){
+    emitter.emit('move_player', {
+        name: req.params.name,
+        position: req.params.position,
+    });
+});
+
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
     console.log('Listening on port ' + port);

@@ -103,12 +103,23 @@
                 }
 
                 function move_marker(player, location) {
+                    if (! players[player]) {
+                        players[player] = {
+                            color: 'grey',
+                            marker: false,
+                        };
+                    }
+
                     if (! players[player].marker) {
                         players[player].marker = new_marker(players[player].color, location);
                     }
 
                     players[player].marker.setPosition(location);
-                    map.panTo(location);
+                    
+                    if (player == current_player) {
+                        map.panTo(location);
+                        $.get('/move_player/' + player + '/' + location.toUrlValue());
+                    }
                 }
 
                 press_start();
@@ -123,12 +134,14 @@
                     console.log('heartbeat');
                 });
 
-                Stream.addEventListener('register_player', function(e){
-                    console.log(e.data);
-                });
-
                 Stream.addEventListener('move_player', function(e){
-                    console.log(e.data);
+                    var player = JSON.parse(e.data);
+
+                    if (player.name == current_player) return;
+
+                    var position = player.position.split(',');
+
+                    move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
                 });
             }
         </script>
