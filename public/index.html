@@ -95,6 +95,7 @@
                     return new google.maps.Marker({
                         map: map,
                         position: location,
+                        clickable: false,
                         icon: {
                             url: 'marker/' + (color || 'grey') + '.png',
                             anchor: new google.maps.Point(4, 4),
@@ -126,6 +127,7 @@
 
                 google.maps.event.addListener(map, 'click', function(event){
                     move_marker(current_player, event.latLng);
+                    return false;
                 });
 
                 var Stream = new EventSource('/stream/' + new Date().getTime());
