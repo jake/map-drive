@@ -92,12 +92,14 @@
                 }
 
                 function new_marker(color, location) {
+                    if (! color || ! marker[color]) color = 'grey';
+
                     return new google.maps.Marker({
                         map: map,
                         position: location,
                         clickable: false,
                         icon: {
-                            url: 'marker/' + (color || 'grey') + '.png',
+                            url: 'marker/' + color + '.png',
                             anchor: new google.maps.Point(4, 4),
                         },
                     });
