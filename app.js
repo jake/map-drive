@@ -32,6 +32,7 @@ app.get('/move_player/:name/:position', function(req, res){
         name: req.params.name,
         position: req.params.position,
     });
+    res.send(':)');
 });
 
 var port = process.env.PORT || 5000;
