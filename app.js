@@ -16,7 +16,7 @@ app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
-app.get('/stream/:name', function(req, res){
+app.get('/stream/:id', function(req, res){
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -24,7 +24,11 @@ app.get('/stream/:name', function(req, res){
     });
     res.write('\n');
 
-    stream.register(req.params.name, res);
+    stream.register(req.params.id, res);
+
+    req.on('close', function() {
+        stream.unregister(req.params.id);
+    });
 });
 
 app.get('/move_player/:name/:position', function(req, res){

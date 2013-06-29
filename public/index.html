@@ -74,7 +74,8 @@
                 function press_start() {
                     if (current_player = prompt('Enter your name:')) {
                         players[current_player] = {
-                            color: prompt('Color? ' + Object.keys(marker).join(', ')),
+                            name: current_player,
+                            color: prompt('Color? ' + Object.keys(marker).join(', '), 'blue'),
                             marker: false,
                         };
 
@@ -105,9 +106,15 @@
                     });
                 }
 
+                function remove_marker(player) {
+                    players[player].marker.setMap(null);
+                    delete players[player];
+                }
+
                 function move_marker(player, location) {
                     if (! players[player]) {
                         players[player] = {
+                            name: player,
                             color: 'grey',
                             marker: false,
                         };
@@ -136,6 +143,10 @@
 
                 Stream.addEventListener('heartbeat', function(e){
                     console.log('heartbeat');
+                });
+
+                Stream.addEventListener('remove_player', function(e){
+                    remove_marker(e.data);
                 });
 
                 Stream.addEventListener('move_player', function(e){
