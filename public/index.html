@@ -74,7 +74,7 @@
                 function press_start() {
                     if (current_player = prompt('Enter your name:')) {
                         players[current_player] = {
-                            color: 'blue',
+                            color: prompt('Color? ' + Object.keys(marker).join(', ')),
                             marker: false,
                         };
 
