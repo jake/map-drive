@@ -1,11 +1,9 @@
 var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
 
 var emitter = require('./lib/emitter');
-var stream  = require('./lib/stream');
-
-var app = express();
-
-stream.start();
 
 app.configure(function(){
     app.use(express.static(__dirname + '/public'));
@@ -16,26 +14,20 @@ app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
-app.get('/stream/:name', function(req, res){
-    res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
+var markers = io.of('/markers').on('connection', function(socket){
+    socket.on('move', function(data){
+        socket.broadcast.emit('move', data);
     });
-    res.write('\n');
 
-    stream.register(req.params.name, res);
-});
-
-app.get('/move_player/:name/:position', function(req, res){
-    emitter.emit('move_player', {
-        name: req.params.name,
-        position: req.params.position,
+    socket.on('disconnect', function(){
+        console.log('Removing player %j', 'player_name');
+        socket.broadcast.emit('remove', {
+            name: 'player_name',
+        });
     });
-    res.send(':)');
 });
 
 var port = process.env.PORT || 5000;
-app.listen(port, function() {
+server.listen(port, function() {
     console.log('Listening on port ' + port);
 });
