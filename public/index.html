@@ -19,7 +19,15 @@
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <script>
+            var socket = io.connect('/');
+
+            socket.on('news', function (data) {
+                console.log(data);
+                socket.emit('my other event', { my: 'data' });
+            });
+
             var marker = {
                 grey:   '#585858',
                 red:    '#cb3333',
@@ -38,7 +46,6 @@
 
             function initialize() {
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
-                    // center: current_location,
                     zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     disableDefaultUI: true,
@@ -139,25 +146,27 @@
                     return false;
                 });
 
-                var Stream = new EventSource('/stream/' + new Date().getTime());
 
-                Stream.addEventListener('heartbeat', function(e){
-                    console.log('heartbeat');
-                });
 
-                Stream.addEventListener('remove_player', function(e){
-                    remove_marker(e.data);
-                });
+                // var Stream = new EventSource('/stream/' + new Date().getTime());
 
-                Stream.addEventListener('move_player', function(e){
-                    var player = JSON.parse(e.data);
+                // Stream.addEventListener('heartbeat', function(e){
+                //     console.log('heartbeat');
+                // });
 
-                    if (player.name == current_player) return;
+                // Stream.addEventListener('remove_player', function(e){
+                //     remove_marker(e.data);
+                // });
 
-                    var position = player.position.split(',');
+                // Stream.addEventListener('move_player', function(e){
+                //     var player = JSON.parse(e.data);
 
-                    move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
-                });
+                //     if (player.name == current_player) return;
+
+                //     var position = player.position.split(',');
+
+                //     move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
+                // });
             }
         </script>
     </head>

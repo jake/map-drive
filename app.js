@@ -14,27 +14,11 @@ app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
-app.get('/stream/:id', function(req, res){
-    res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
+io.sockets.on('connection', function (socket){
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data){
+        console.log(data);
     });
-    res.write('\n');
-
-    stream.register(req.params.id, res);
-
-    req.on('close', function() {
-        stream.unregister(req.params.id);
-    });
-});
-
-app.get('/move_player/:name/:position', function(req, res){
-    emitter.emit('move_player', {
-        name: req.params.name,
-        position: req.params.position,
-    });
-    res.send(':)');
 });
 
 var port = process.env.PORT || 5000;
