@@ -19,6 +19,7 @@
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <script>
             var marker = {
                 grey:   '#585858',
@@ -37,8 +38,11 @@
             google.maps.event.addDomListener(window, 'load', initialize);
 
             function initialize() {
+                var socket = {
+                    markers: io.connect('/markers'),
+                };
+
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
-                    // center: current_location,
                     zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     disableDefaultUI: true,
@@ -72,9 +76,10 @@
                 });
 
                 function press_start() {
-                    if (current_player = prompt('Enter your name:')) {
+                    if (current_player = Math.random()) { // prompt('Enter your name:')) {
                         players[current_player] = {
-                            color: prompt('Color? ' + Object.keys(marker).join(', ')),
+                            name: current_player,
+                            color: 'blue', // prompt('Color? ' + Object.keys(marker).join(', '), 'blue'),
                             marker: false,
                         };
 
@@ -105,9 +110,15 @@
                     });
                 }
 
+                function remove_marker(player) {
+                    players[player].marker.setMap(null);
+                    delete players[player];
+                }
+
                 function move_marker(player, location) {
                     if (! players[player]) {
                         players[player] = {
+                            name: player,
                             color: 'grey',
                             marker: false,
                         };
@@ -121,7 +132,11 @@
                     
                     if (player == current_player) {
                         map.panTo(location);
-                        $.get('/move_player/' + player + '/' + location.toUrlValue());
+
+                        socket.markers.emit('move', {
+                            name: player,
+                            position: location.toUrlValue(),
+                        });
                     }
                 }
 
@@ -132,20 +147,18 @@
                     return false;
                 });
 
-                var Stream = new EventSource('/stream/' + new Date().getTime());
+                socket.markers.on('connect', function(){
+                    socket.markers.on('move', function(player) {
+                        if (player.name == current_player) return;
 
-                Stream.addEventListener('heartbeat', function(e){
-                    console.log('heartbeat');
-                });
+                        var position = player.position.split(',');
 
-                Stream.addEventListener('move_player', function(e){
-                    var player = JSON.parse(e.data);
+                        move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
+                    });
 
-                    if (player.name == current_player) return;
-
-                    var position = player.position.split(',');
-
-                    move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
+                    socket.markers.on('remove', function(player){
+                        remove_marker(player.name);
+                    });
                 });
             }
         </script>
