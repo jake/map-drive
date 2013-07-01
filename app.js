@@ -1,8 +1,9 @@
 var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
 
 var emitter = require('./lib/emitter');
-
-var app = express();
 
 app.configure(function(){
     app.use(express.static(__dirname + '/public'));
@@ -37,6 +38,6 @@ app.get('/move_player/:name/:position', function(req, res){
 });
 
 var port = process.env.PORT || 5000;
-app.listen(port, function() {
+server.listen(port, function() {
     console.log('Listening on port ' + port);
 });
