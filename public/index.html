@@ -21,13 +21,6 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            var socket = io.connect('/');
-
-            socket.on('news', function (data) {
-                console.log(data);
-                socket.emit('my other event', { my: 'data' });
-            });
-
             var marker = {
                 grey:   '#585858',
                 red:    '#cb3333',
@@ -45,6 +38,10 @@
             google.maps.event.addDomListener(window, 'load', initialize);
 
             function initialize() {
+                var socket = {
+                    markers: io.connect('/markers'),
+                };
+
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
                     zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -79,10 +76,10 @@
                 });
 
                 function press_start() {
-                    if (current_player = prompt('Enter your name:')) {
+                    if (current_player = Math.random()) { // prompt('Enter your name:')) {
                         players[current_player] = {
                             name: current_player,
-                            color: prompt('Color? ' + Object.keys(marker).join(', '), 'blue'),
+                            color: 'blue', // prompt('Color? ' + Object.keys(marker).join(', '), 'blue'),
                             marker: false,
                         };
 
@@ -135,7 +132,11 @@
                     
                     if (player == current_player) {
                         map.panTo(location);
-                        $.get('/move_player/' + player + '/' + location.toUrlValue());
+
+                        socket.markers.emit('move', {
+                            name: player,
+                            position: location.toUrlValue(),
+                        });
                     }
                 }
 
@@ -146,27 +147,19 @@
                     return false;
                 });
 
+                socket.markers.on('connect', function(){
+                    socket.markers.on('move', function(player) {
+                        if (player.name == current_player) return;
 
+                        var position = player.position.split(',');
 
-                // var Stream = new EventSource('/stream/' + new Date().getTime());
+                        move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
+                    });
 
-                // Stream.addEventListener('heartbeat', function(e){
-                //     console.log('heartbeat');
-                // });
-
-                // Stream.addEventListener('remove_player', function(e){
-                //     remove_marker(e.data);
-                // });
-
-                // Stream.addEventListener('move_player', function(e){
-                //     var player = JSON.parse(e.data);
-
-                //     if (player.name == current_player) return;
-
-                //     var position = player.position.split(',');
-
-                //     move_marker(player.name, new google.maps.LatLng(position[0], position[1]));
-                // });
+                    socket.markers.on('remove', function(player){
+                        remove_marker(player.name);
+                    });
+                });
             }
         </script>
     </head>

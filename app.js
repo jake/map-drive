@@ -14,10 +14,16 @@ app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
-io.sockets.on('connection', function (socket){
-    socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data){
-        console.log(data);
+var markers = io.of('/markers').on('connection', function(socket){
+    socket.on('move', function(data){
+        socket.broadcast.emit('move', data);
+    });
+
+    socket.on('disconnect', function(){
+        console.log('Removing player %j', 'player_name');
+        socket.broadcast.emit('remove', {
+            name: 'player_name',
+        });
     });
 });
 
