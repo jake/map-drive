@@ -1,11 +1,8 @@
 var express = require('express');
 
 var emitter = require('./lib/emitter');
-var stream  = require('./lib/stream');
 
 var app = express();
-
-stream.start();
 
 app.configure(function(){
     app.use(express.static(__dirname + '/public'));
