@@ -111,6 +111,8 @@
                 }
 
                 function remove_marker(player) {
+                    if (! (players[player] && players[player].marker)) return;
+
                     players[player].marker.setMap(null);
                     delete players[player];
                 }
