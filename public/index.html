@@ -43,6 +43,7 @@
                 };
 
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
+                    center: new google.maps.LatLng(0.0, 0.0),
                     zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     disableDefaultUI: true,
@@ -85,9 +86,12 @@
 
                         if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(function(position){
-                                move_marker(current_player, new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+                                move_marker(current_player, new google.maps.LatLng(
+                                    position.coords.latitude,
+                                    position.coords.longitude
+                                ));
                             }, function(err){
-                                alert(err);
+                                alert('navigator.geolocation.getCurrentPosition error: ' +  err);
                             });
                         }
                     } else {
@@ -117,7 +121,7 @@
                     delete players[player];
                 }
 
-                function move_marker(player, location) {
+                function move_marker(player, to_position) {
                     if (! players[player]) {
                         players[player] = {
                             name: player,
@@ -127,18 +131,44 @@
                     }
 
                     if (! players[player].marker) {
-                        players[player].marker = new_marker(players[player].color, location);
+                        players[player].marker = new_marker(players[player].color, to_position);
+
+                        if (player == current_player) {
+                            map.panTo(to_position);
+                        }
+                    } else {
+                        var from_position = players[player].marker.getPosition();
+
+                        var frames = [];
+                        for (var percent = 0; percent < 1; percent += 0.02) {
+                            frames.push(new google.maps.LatLng(
+                                from_position.lat() + percent * (to_position.lat() - from_position.lat()),
+                                from_position.lng() + percent * (to_position.lng() - from_position.lng())
+                            ));
+                        }
+
+                        tween_marker(player, frames, 0, 20);
                     }
 
-                    players[player].marker.setPosition(location);
-                    
                     if (player == current_player) {
-                        map.panTo(location);
-
                         socket.markers.emit('move', {
                             name: player,
-                            position: location.toUrlValue(),
+                            position: to_position.toUrlValue(),
                         });
+                    }
+                }
+
+                function tween_marker(player, frames, index, delay) {
+                    players[player].marker.setPosition(frames[index]);
+
+                    if (player == current_player) {
+                        map.panTo(frames[index]);
+                    }
+
+                    if (index < frames.length - 1) {
+                        window.setTimeout(function(){
+                            tween_marker(player, frames, index + 1, delay);
+                        }, delay);
                     }
                 }
 
@@ -146,7 +176,6 @@
 
                 google.maps.event.addListener(map, 'click', function(event){
                     move_marker(current_player, event.latLng);
-                    return false;
                 });
 
                 socket.markers.on('connect', function(){
