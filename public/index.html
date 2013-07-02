@@ -179,6 +179,10 @@
                 });
 
                 socket.markers.on('connect', function(){
+                    socket.markers.emit('join', {
+                        name: current_player
+                    });
+
                     socket.markers.on('move', function(player) {
                         if (player.name == current_player) return;
 

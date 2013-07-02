@@ -15,14 +15,22 @@ app.configure('development', function(){
 });
 
 var markers = io.of('/markers').on('connection', function(socket){
+    socket.on('join', function(player){
+        socket.set('player_name', player.name);
+    });
+
     socket.on('move', function(data){
         socket.broadcast.emit('move', data);
     });
 
     socket.on('disconnect', function(){
-        console.log('Removing player %j', 'player_name');
-        socket.broadcast.emit('remove', {
-            name: 'player_name',
+        socket.get('player_name', function(err, player_name){
+            if (err) throw err;
+
+            console.log('Removing player %j', player_name);
+            socket.broadcast.emit('remove', {
+                name: player_name,
+            });
         });
     });
 });
