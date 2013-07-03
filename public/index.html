@@ -108,9 +108,16 @@
                         position: location,
                         clickable: false,
                         icon: {
-                            url: 'marker/' + color + '.png',
-                            anchor: new google.maps.Point(4, 4),
+                            url: 'emoji_sprite_avatars_64.png',
+                            scaledSize: new google.maps.Size(32, 3968),
+                            size: new google.maps.Size(32, 32),
+                            anchor: new google.maps.Point(16, 30),
+                            origin: new google.maps.Point(0, 32 * 82),
                         },
+                        // icon: {
+                        //     url: 'marker/' + color + '.png',
+                        //     anchor: new google.maps.Point(4, 4),
+                        // },
                     });
                 }
 
