@@ -52,6 +52,7 @@
             function initialize() {
                 var socket = {
                     markers: io.connect('/markers'),
+                    chat: io.connect('/chat'),
                 };
 
                 var map = new google.maps.Map(document.getElementById('map-canvas'), {
@@ -214,6 +215,8 @@
                 }
 
                 function show_chat(player, message) {
+                    if (! (players[player] && players[player].chat_box)) return;
+
                     players[player].chat_box.setContent(message);
                     players[player].chat_box.show();
                 }
@@ -238,12 +241,21 @@
                     move_marker(current_player, event.latLng);
                 });
 
+                socket.chat.on('connect', function(){
+                    socket.chat.on('message', function(data){
+                        if (data.player.name == current_player) return;
+
+                        show_chat(data.player.name, data.message);
+                    });
+
+                });
+
                 socket.markers.on('connect', function(){
                     socket.markers.emit('join', {
                         name: current_player
                     });
 
-                    socket.markers.on('move', function(player) {
+                    socket.markers.on('move', function(player){
                         if (player.name == current_player) return;
 
                         var position = player.position.split(',');

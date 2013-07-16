@@ -35,6 +35,12 @@ var markers = io.of('/markers').on('connection', function(socket){
     });
 });
 
+var chat = io.of('/chat').on('connection', function(socket){
+    socket.on('message', function(data){
+        socket.broadcast.emit('message', data);
+    });
+});
+
 var port = process.env.PORT || 5000;
 server.listen(port, function() {
     console.log('Listening on port ' + port);
