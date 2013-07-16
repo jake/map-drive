@@ -221,6 +221,15 @@
                     players[player].chat_box.show();
                 }
 
+                function send_chat(message) {
+                    socket.chat.emit('message', {
+                        player: {
+                            name: current_player,
+                        },
+                        message: prompt('Say something:'),
+                    });
+                }
+
                 function tween_marker(player, frames, index, delay) {
                     players[player].marker.setPosition(frames[index]);
 
@@ -239,6 +248,10 @@
 
                 google.maps.event.addListener(map, 'click', function(event){
                     move_marker(current_player, event.latLng);
+                });
+
+                google.maps.event.addListener(map, 'dblclick', function(event){
+                    send_chat();
                 });
 
                 socket.chat.on('connect', function(){
