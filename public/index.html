@@ -127,21 +127,17 @@
                             origin: new google.maps.Point(0, 32 * 82),
                         },
                         zIndex: 20,
-                        // icon: {
-                        //     url: 'marker/' + color + '.png',
-                        //     anchor: new google.maps.Point(4, 4),
-                        // },
                     });
 
                     var chat = new InfoBox({
-                        content: 'does anyone have some hookups?',
+                        content: '',
                         disableAutoPan: true,
                         maxWidth: 150,
                         alignBottom: true,
                         pixelOffset: new google.maps.Size(5, -10),
                         boxClass: 'chat_box',
                         closeBoxURL: '',
-                        isHidden: false,
+                        isHidden: true,
                         zIndex: 10,
                         pane: 'overlayShadow',
                     });
