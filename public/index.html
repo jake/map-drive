@@ -115,7 +115,7 @@
                 function new_marker(color, location) {
                     if (! color || ! marker[color]) color = 'grey';
 
-                    var _marker = new google.maps.Marker({
+                    return new google.maps.Marker({
                         map: map,
                         position: location,
                         clickable: false,
@@ -128,7 +128,9 @@
                         },
                         zIndex: 20,
                     });
+                }
 
+                function new_chat_box() {
                     var chat = new InfoBox({
                         content: '',
                         disableAutoPan: true,
@@ -142,9 +144,7 @@
                         pane: 'overlayShadow',
                     });
 
-                    chat.open(map, _marker);
-
-                    return _marker;
+                    return chat;
                 }
 
                 function new_circle(player) {
@@ -168,6 +168,7 @@
                     if (! (players[player] && players[player].marker)) return;
 
                     players[player].marker.setMap(null);
+                    players[player].chat_box.close();
                     delete players[player];
                 }
 
@@ -182,6 +183,9 @@
 
                     if (! players[player].marker) {
                         players[player].marker = new_marker(players[player].color, to_position);
+                        players[player].chat_box = new_chat_box();
+
+                        players[player].chat_box.open(map, players[player].marker);
 
                         if (player == current_player) {
                             new_circle(player);
@@ -207,6 +211,10 @@
                             position: to_position.toUrlValue(),
                         });
                     }
+                }
+
+                function show_chat(player, message) {
+
                 }
 
                 function tween_marker(player, frames, index, delay) {
