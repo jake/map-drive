@@ -13,12 +13,24 @@
                 padding: 0;
             }
 
+            .chat_box {
+                background: #fff;
+                border-radius: 3px;
+                padding: 10px 15px;
+                width: 150px;
+                box-shadow: 0 2px 5px rgba(0,0,0, 0.15);
+                border: 1px solid rgba(0,0,0, 0.15);
+                font: normal 13px/18px 'Helvetica Neue', 'HelveticaNeue', Helvetica, Arial, sans-serif !important;
+                color: #7f7f7f;
+            }
+
             #map-canvas {
                 height: 100%;
             }
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgvlyo4nN9Iz10uJ6vswQ_TQbrpTpcGWg&amp;sensor=true"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="/google.maps.infobox.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
             var marker = {
@@ -103,7 +115,7 @@
                 function new_marker(color, location) {
                     if (! color || ! marker[color]) color = 'grey';
 
-                    return new google.maps.Marker({
+                    var _marker = new google.maps.Marker({
                         map: map,
                         position: location,
                         clickable: false,
@@ -114,11 +126,29 @@
                             anchor: new google.maps.Point(16, 30),
                             origin: new google.maps.Point(0, 32 * 82),
                         },
+                        zIndex: 20,
                         // icon: {
                         //     url: 'marker/' + color + '.png',
                         //     anchor: new google.maps.Point(4, 4),
                         // },
                     });
+
+                    var chat = new InfoBox({
+                        content: 'does anyone have some hookups?',
+                        disableAutoPan: true,
+                        maxWidth: 150,
+                        alignBottom: true,
+                        pixelOffset: new google.maps.Size(5, -10),
+                        boxClass: 'chat_box',
+                        closeBoxURL: '',
+                        isHidden: false,
+                        zIndex: 10,
+                        pane: 'overlayShadow',
+                    });
+
+                    chat.open(map, _marker);
+
+                    return _marker;
                 }
 
                 function new_circle(player) {
