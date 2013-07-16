@@ -214,7 +214,8 @@
                 }
 
                 function show_chat(player, message) {
-
+                    players[player].chat_box.setContent(message);
+                    players[player].chat_box.show();
                 }
 
                 function tween_marker(player, frames, index, delay) {
